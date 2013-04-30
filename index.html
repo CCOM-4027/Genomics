@@ -1,98 +1,102 @@
 <!doctype html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Genomics</title>
+	<head>
+    		<meta charset="utf-8">
+    		<meta http-equiv="X-UA-Compatible" content="chrome=1">
+    		<title>Genomics</title>
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="javascripts/scale.fix.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-  </head>
-  <body>
-    <div class="wrapper">
-      <header>
-        <h1 class="header">Genomics</h1>
-        <p class="header"></p>
+    		<link rel="stylesheet" href="stylesheets/styles.css">
+    		<link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    		<script src="javascripts/scale.fix.js"></script>
+    		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    		<!--[if lt IE 9]>
+    		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    		<![endif]-->
+  	</head>
+  	<body>
+    		<div class="wrapper">
+      			<header>
+        		<h1 class="header">Genomics</h1>
+        		<p class="header"></p>
 
-        <ul>
-          <li class="download"><a class="buttons" href="https://github.com/CCOM-4027/Genomics/archive/master.zip">Download ZIP</a></li>
-          <li class="download"><a class="buttons" href="https://github.com/CCOM-4027/Genomics/tarball/master">Download TAR</a></li>
-          <li><a class="buttons github" href="https://github.com/CCOM-4027/Genomics/tree/gh-pages">View On GitHub</a></li>
-        </ul>
+        		<ul>
+          			<li class="download"><a class="buttons" href="https://github.com/CCOM-4027/Genomics/archive/master.zip">Download ZIP</a></li>
+          			<li class="download"><a class="buttons" href="https://github.com/CCOM-4027/Genomics/tarball/master">Download TAR</a></li>
+          			<li><a class="buttons github" href="https://github.com/CCOM-4027/Genomics/tree/gh-pages">View On GitHub</a></li>
+        		</ul>
 
-        <p class="header">This project is maintained by <a class="header name" href="https://github.com/CCOM-4027">CCOM-4027</a></p>
+        		<p class="header">This project is maintained by <a class="header name" href="https://github.com/CCOM-4027">CCOM-4027</a></p>
+      			</header>
+      			
+      			<section>
+        			<h2>Welcome to the Genomics Project</h2>
 
+				<p>
+					This project focuses on database management in the field of genomics.
+					The purpose of this project is to create a tool to properly analyze
+					sequences' contigs. This database would allow us to look for, among other things,
+					motifs, by doing a “contig  alignment”. It allows us to ask, for example,
+					for all species in which two particular contigs occur within a certain distance
+					from each other.
+				</p>
 
-      </header>
-      <section>
-        <h2>Welcome to the Genomics Project</h2>
+				<h2>How it Works</h2>
 
-<p>
-	This project focuses on database management in the field of genomics.
-	The purpose of this project is to create a tool to properly analyze
-	sequences' contigs. This database would allow us to look for, among other things,
-	motifs, by doing a “contig  alignment”. It allows us to ask, for example,
-	for all species in which two particular contigs occur within a certain distance
-	from each other.
-</p>
+				<p>
+					Briefly, a contig is a hypothetical sequence; a sequence of dna or rna is split into many small
+					fragments and then assembled based on the likeliest pairings, in general short pairings are more
+					likely than long pairings. A contig can represent anything from a coding region in dna
+					(code that translates into a protein), regulatory regions (code that controls the expression of other code)
+					or an entire gene. You may have many contigs inside a single one, or two given contigs may overlap.
+					The job of genomicists is to accurately asses the composition and the function of each contig
+					and how these relate to other contigs. Both, the composition and function of contigs follow general patterns
+					called ‘motifs’, you might find similar contigs in a particular order. To determine the similarity between
+					contigs we do what are called alignments, which matches two sequences such that their base pairs occur
+					in the same order with the least number of gaps between them.	
+				</p>
 
-<h2>How it Works</h2>
+				<p>
+					In order to aid genomicists in this monumental task we've created a set of tools to help store and retrieve
+					this information. The database is meant ta be accessed via a set of scripts that return the information in
+					a convenient and universal format.
+				</p>
 
-<p>
-	Briefly, a contig is a hypothetical sequence; a sequence of dna or rna is split into many small
-	fragments and then assembled based on the likeliest pairings, in general short pairings are more
-	likely than long pairings. A contig can represent anything from a coding region in dna
-	(code that translates into a protein), regulatory regions (code that controls the expression of other code)
-	or an entire gene. You may have many contigs inside a single one, or two given contigs may overlap.
-	The job of genomicists is to accurately asses the composition and the function of each contig
-	and how these relate to other contigs. Both, the composition and function of contigs follow general patterns
-	called ‘motifs’, you might find similar contigs in a particular order. To determine the similarity between
-	contigs we do what are called alignments, which matches two sequences such that their base pairs occur
-	in the same order with the least number of gaps between them.	
-</p>
+				<h2>Technologies</h2>
 
-<p>
-	In order to aid genomicists in this monumental task we've created a set of tools to help store and retrieve
-	this information. The database is meant ta be accessed via a set of scripts that return the information in
-	a convenient and universal format.
-</p>
+				<ul>
+					<a href="http://www.python.org/download/releases/2.7.4/">
+						<li>Python</li>
+					</a>
+			
+					<a href="http://biopython.org/wiki/Download">
+						<li>BioPython</li>
+					</a>
+				
+					<a href="http://dev.mysql.com/doc/refman/5.1/en/installing.html">
+						<li>MySQL</li>
+					</a>
+				
+					<a href="http://zetcode.com/db/mysqlpython/">
+						<li>MySQLDB package for Python</li>
+					</a>
+				</ul>
 
-<h2>Technologies</h2>
+				<h2>Authors</h2>
 
-<ul>
-	<a href="http://www.python.org/download/releases/2.7.4/">
-		<li>Python</li>
-	</a>
-	<a href="http://biopython.org/wiki/Download">
-		<li>BioPython</li>
-	</a>
-	<a href="http://dev.mysql.com/doc/refman/5.1/en/installing.html">
-		<li>MySQL</li>
-	</a>
-	<a href="http://zetcode.com/db/mysqlpython/">
-		<li>MySQLDB package for Python</li>
-	</a>
-</ul>
+				<ul>
+					<li>Alejandro Vientós</li>
+					<li>Roberto Arce</li>
+					<li>Juan Gallisá</li>
+				</ul>
 
-<h2>Authors</h2>
+				<h2>Support or Contact</h2>
 
-<ul>
-	<li>Alejandro Vientós</li>
-	<li>Roberto Arce</li>
-	<li>Juan Gallisá</li>
-</ul>
-
-<h2>Support or Contact</h2>
-
-<p>Insert contact information here</p>
-      </section>
-    </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+				<p>
+					<a href="mailto:alejandro.vientos@upr.edu"></a>
+				</p>
+      			</section>
+    		</div>
+    	<!--[if !IE]><script>fixScale(document);</script><![endif]-->
 		
-  </body>
+  	</body>
 </html>
