@@ -11,10 +11,13 @@ def hasher(string):
     m = hashlib.md5()
     m.update(string)
     return m.digest()
+    
+def file_type(file):
+    return "fasta"
 
 def file_to_entry(filename):
     seq_entries = []
-    for seq_record in SeqIO.parse(filename, "fasta"):
+    for seq_record in SeqIO.parse(filename, file_type()):
         seq_entries.append(SeqEntry(seq_record.id,
                                     hasher(str(seq_record.seq)),
                                     filename))
