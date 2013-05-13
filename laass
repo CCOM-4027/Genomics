@@ -1,5 +1,6 @@
 #!/usr/bin/python
-import os,sys, argparse
+import os, sys, argparse
+import parsingfasta as parse
 #import bobby, juan
 extensions = ['.fasta',',gbk','sam']
 
@@ -9,59 +10,48 @@ parser.add_argument('-o', '--output')
 parser.add_argument('-q', '--query')
 args = parser.parse_args()
 
-def extension(input):
-    path, ext = os.path.splitext(input)
-    return ext
-
-def file_2_seq(filename):
+def file2seqs(filename):
     print "converting file",filename, "to sequence object"
-    return filename
+    return parse.file_to_entries(filename)
 
-def make_file(filename):
-    if extension(filename) in extensions:
-        print "file", filename, "created!"
+def make_file(sequences, filename):
+    if parse.extension(filename) in extensions:
+        print "file", filename, "created with the following sequences"
+        for sequence in sequences:
+            print "\t", sequence.id
     else:
         print "Error: specified invalid file extension for output"
 
 def python2db(entries):
     print "adding the following entries to the database:"
     for entry in entries:
-        print "\t",entry
+        print "\t", entry.location
 
 def eval_query(query):
     print "Query sent:", query
 
+
 sequences = []
 if args.input:
-    #if input path exists
-    if os.path.exists(args.input):
-        #define a function to append files to the list of sequences
-        def add_to_sequences(file):
-            #only if it has a valid extension
-            if extension(file) in extensions:
-                sequences.append(file_2_seq(file))
-        #then if the path is a directory
-        if os.path.isdir(args.input):
-            #then every file
-            for filename in os.listdir(args.input):
-                #is added to the sequence list
-                add_to_sequences(filename)
-        else: 
-            #the sigle file is added
-            add_to_sequences(args.input)
+    if not os.path.exists(args.input): 
+        print "File or directory does not exist"
     else:
-        print "Invalid path specified"
+        def add2sequences(file):
+            if parse.extension(file) in extensions:
+                sequences.extend(file2seqs(file))
+
+        if os.path.isdir(args.input):
+            for filename in os.listdir(args.input):
+                add2sequences(filename)
+        else: 
+            add2sequences(args.input)
     python2db(sequences)
 
 if args.query:
     eval_query(args.query)
 
 if args.output:
-    make_file(args.output)
-
-
-
-
+    make_file(sequences, args.output)
 
 
 
