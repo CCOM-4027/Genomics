@@ -10,14 +10,14 @@ Function definitions:
 	2)createUserDB()
 		Precondition: Database and Tables have been created
 		Postcondition: New user in the database with acces to tables
-        3)dropDatabase()
-                Precondition: Database has been created
+    3)dropDatabase()
+        Precondition: Database has been created
 		Postcondition: Database Droped
-        4)dropUser()
-                Precondition: Users have been created
-                Postcondition: Specified user droped
+    4)dropUser()
+        Precondition: Users have been created
+        Postcondition: Specified user droped
  """
-tables = ["CREATE TABLE Sequences(seqID TEXT, seq_hash TEXT)", "CREATE TABLE Reeds(sample_ID INT, seq_hash TEXT)", "CREATE TABLE Assembled(Assembler TEXT, sample_ID TEXT, seqID TEXT, seqHash TEXT)", "CREATE TABLE Align(aligner TEXT, source_ID TEXT, target_ID TEXT, target_hash TEXT)" ]
+tables = ["CREATE TABLE Sequences(seqID TEXT, seqHash TEXT)", "CREATE TABLE Reeds(sampleID INT, seqHash TEXT)", "CREATE TABLE Assembled(Assembler TEXT, sampleID TEXT, seqID TEXT, seqHash TEXT)", "CREATE TABLE Align(aligner TEXT, sourceID TEXT, targetID TEXT, targetHash TEXT)" ]
 
 #Create database
 def createDatabase(tables):
@@ -131,7 +131,6 @@ def dropUser():
         if con:
             con.close()
 
-        
 
 #Terminal Menu (User Interface)
 stay = True
