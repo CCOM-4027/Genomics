@@ -12,7 +12,7 @@ def hasher(string):
     m.update(string)
     return m.digest()
     
-def file_type(file):
+def file_type(f):
     return "fasta"
 
 def file_to_entry(filename):
