@@ -1,7 +1,7 @@
 #make user test
 import MySQLdb as mdb
-import sys
-import getpass
+import sys, getpass
+from laad import do
 """
 Function definitions:
 	1)createDatabase()
@@ -17,30 +17,24 @@ Function definitions:
         Precondition: Users have been created
         Postcondition: Specified user droped
  """
-tables = ["CREATE TABLE Sequences(seqID TEXT, seqHash TEXT)", "CREATE TABLE Reeds(sampleID INT, seqHash TEXT)", "CREATE TABLE Assembled(Assembler TEXT, sampleID TEXT, seqID TEXT, seqHash TEXT)", "CREATE TABLE Align(aligner TEXT, sourceID TEXT, targetID TEXT, targetHash TEXT)" ]
 
 #Create database
-def createDatabase(tables, sql):
-    print"\nThis will create tables automatically"
-
+def createDatabase():
+    from settings import tables
+    password=getpass.getpass("Please insert root password: ")
     try:
-        #Database creation
-        sql.execute("CREATE DATABASE genomedb")
+        #Connection
+        con = mdb.connect('localhost', 'root', password)
+        cur = con.cursor()
+        cur.execute("CREATE DATABASE genomedb")
+
         #Table creation
-        sql.execute("Use genomedb")
-        #sql.execute("CREATE TABLE Reads(sample_ID INT)")
+        cur.execute("Use genomedb")
         for table in tables:
-            sql.execute(table)
+            cur.execute(table)
         print"Tables Created!"
-
-        sql.execute("CREATE USER 'laadguest'@'localhost' IDENTIFIED BY 'password'")
-        sql.execute("GRANT ALL ON genomedb.* TO 'laadguest'@'localhost'")
-
-        print "Created guest user"
-
     except mdb.Error, e:
         print "Error %d: %s" % (e.args[0],e.args[1])
-
     finally:
         if con:
             con.close()
@@ -73,40 +67,22 @@ def createUserDB(sql):
   
         print "Error %d: %s" % (e.args[0],e.args[1])
 
-    finally:    
-        
-        if con:    
-            con.close()
 
-def dropDatabase():
+def dropDatabase(sql):
     try:
-        #Database Drop
         sql.execute("Drop database genomedb")
 	print "Done!"
-
     except mdb.Error, e:
-
         print "Error %d: %s" % (e.args[0],e.args[1])
 
-    finally:
-
-        if con:
-            con.close()
-
-def dropUser():
-
+def dropUser(sql):
     try:
-        #User Drop()
         print "Please indicate the user you which to delete"
 	user = raw_input()
         sql.execute("Drop User %s@localhost",(user))
         print "User deleted"
-
     except mdb.Error, e:
         print "Error %d: %s" % (e.args[0],e.args[1])
-    finally:
-        if con:
-            con.close()
 
 
 #Terminal Menu (User Interface)
@@ -120,12 +96,11 @@ while stay:
     if choose == "/q":
         stay = False
     elif choose == "1":
-	createDatabase(tables)
+	createDatabase()
     elif choose == "2":
-	createUserDB()
+	do(createUserDB,'root')
     elif choose == "3":
-	dropDatabase()
+	do(dropDatabase,'root')
     elif choose == "4":
-        dropUser()
-
+        do(dropUser,'root')
 print "Bye"
