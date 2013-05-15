@@ -40,6 +40,12 @@ def createDatabase(tables):
             cur.execute(table)
 
         print"Tables Created!"
+
+        cur.execute("CREATE USER 'laadguest'@'localhost' IDENTIFIED BY 'password'")
+        cur.execute("GRANT ALL ON genomedb.* TO 'laadguest'@'localhost'")
+
+        print "Created guest user"
+
     except mdb.Error, e:
   
         print "Error %d: %s" % (e.args[0],e.args[1])
@@ -125,6 +131,8 @@ def dropUser():
         print "Please indicate the user you which to delete"
 	user = raw_input()
         cur.execute("Drop User %s@localhost",(user))
+        print "User deleted"
+
     except mdb.Error, e:
         print "Error %d: %s" % (e.args[0],e.args[1])
     finally:
