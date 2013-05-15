@@ -27,10 +27,9 @@ def createDatabase(tables):
 
     try:
         #Connection
-        con = mdb.connect('localhost', 'root',
-        password);
+        con = mdb.connect('localhost', 'root', password)
         cur = con.cursor()
-        #Database creation
+#Database creation
         cur.execute("CREATE DATABASE genomedb")
 
         #Table creation
@@ -38,7 +37,6 @@ def createDatabase(tables):
         #cur.execute("CREATE TABLE Reads(sample_ID INT)")
         for table in tables:
             cur.execute(table)
-
         print"Tables Created!"
 
         cur.execute("CREATE USER 'laadguest'@'localhost' IDENTIFIED BY 'password'")
@@ -47,12 +45,10 @@ def createDatabase(tables):
         print "Created guest user"
 
     except mdb.Error, e:
-  
         print "Error %d: %s" % (e.args[0],e.args[1])
-    
-    finally:    
-        
-        if con:    
+
+    finally:
+        if con:
             con.close()
 
 #Create user
@@ -63,8 +59,7 @@ def createUserDB():
     password=getpass.getpass()
     try:
         #Connection
-        con = mdb.connect('localhost', 'root', 
-        password);
+        con = mdb.connect('localhost', 'root', password);
 	cur = con.cursor()
         #New user
         print"\nInsert new user name and password"

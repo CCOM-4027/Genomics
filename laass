@@ -1,13 +1,16 @@
 #!/usr/bin/python
 import os, sys, argparse
 import parsingfasta as parse
-#import bobby, juan
+import laad
+
 extensions = ['.fasta',',gbk','sam']
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-i', '--input')
-parser.add_argument('-o', '--output')
+parser.add_argument('-of', '--output file')
 parser.add_argument('-q', '--query')
+parser.add_argument('-u', '--user', default='laadguest')
+parser.add_argument('-v', '--verbose')
 args = parser.parse_args()
 
 def file2seqs(filename):
@@ -22,13 +25,6 @@ def make_file(sequences, filename):
     else:
         print "Error: specified invalid file extension for output"
 
-def python2db(entries):
-    print "adding the following entries to the database:"
-    for entry in entries:
-        print "\t", entry.location
-
-def eval_query(query):
-    print "Query sent:", query
 
 
 sequences = []
@@ -45,33 +41,14 @@ if args.input:
                 add2sequences(filename)
         else: 
             add2sequences(args.input)
-    python2db(sequences)
+    if args.verbose:
+        print "adding sequences to database"
+    laad.addseqs(sequences)
 
 if args.query:
-    eval_query(args.query)
+    if args.verbose:
+        print "Sending query:", args.query
+    sequences = laad.query(args.query, args.user)
 
 if args.output:
     make_file(sequences, args.output)
-
-
-
-
-"""
-if args.file:
-    seqs = bobby.loadfasta(args.file)
-    for sequence in seqs:
-        juan.seqinput(sequence)
-
-if args.outputfile:
-    output = 
-    for seq in seqs:
-        eu
-
-tables = [
-    "Create TABLE sequences <schema>",
-    "create table reads",
-    "create Table assembler"
-    "Create stuff"
-    ]
-create seqs with values (seqID, seqHash, file (seqHash, seqID) unique)
-"""
