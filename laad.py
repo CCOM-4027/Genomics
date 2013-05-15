@@ -1,6 +1,7 @@
 import MySQLdb as mdb
 import sys
 import getpass
+import parsingfasta
 
 def Gdataentry(sequences):
     """
@@ -31,7 +32,7 @@ def Gquery(query):
     user=raw_input("User:")
     password = getpass.getpass()
     """
-    SeqEntry sequences
+    sequences = SeqEntry()
 
     try:
         #Connecting
@@ -51,7 +52,7 @@ def Gquery(query):
                 for seq in sequences:
                     seq.hash = row
 
-       except mdb.Error, e:
+    except mdb.Error, e:
         print "Error %d: %s" % (e.args[0],e.args[1])
 
     finally:
