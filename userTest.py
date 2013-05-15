@@ -134,6 +134,27 @@ def dropUser():
         if con:
             con.close()
 
+def tableManagement():
+
+    try:
+        #Connection
+        con = mdb.connect('localhost', 'laadguest', 'password', 'genomedb')
+        cur = con.cursor()
+        #showing tables
+        cur.execute("show tables;")
+        rows = cur.fetchall()
+
+        for row in rows:
+            print row
+    
+    except mdb.Error, e:
+        print "Error %d: %s" % (e.args[0],e.args[1])
+
+    finally:
+        if con:
+            con.close()
+
+
 
 #Terminal Menu (User Interface)
 stay = True
@@ -141,17 +162,20 @@ print "\n\tWelcome to genome database test\nWARNING:Create database if not done 
 
 while stay:
     print "\n\t----------------------------------------------------\nChoose:"
-    print "\t\t1)Create database\n\t\t2)Create New User\n\t\t3)Drop Database\n\t\t4)Delete User"
+    print "\t\t1)Create database\n\t\t2)Create New User\n\t\t3)Drop Database\n\t\t4)Delete User\n\t\t5)Show tables"
     choose=raw_input("\nIf you wish to quit write '/q' else write number of Command:")
     if choose == "/q":
         stay = False
     elif choose == "1":
-	createDatabase(tables)
+	   createDatabase(tables)
     elif choose == "2":
-	createUserDB()
+	   createUserDB()
     elif choose == "3":
-	dropDatabase()
+	   dropDatabase()
     elif choose == "4":
         dropUser()
+    elif choose == "5":
+        tableManagement()
+
 
 print "Bye"
