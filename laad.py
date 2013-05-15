@@ -1,6 +1,7 @@
 import MySQLdb as mdb
-import sys
-import getpass
+import sys, getpass
+from parsingfasta import SeqEntry
+
 
 def Gdataentry(sequences):
 """
@@ -14,37 +15,29 @@ def Gdataentry(sequences):
         cur = con.cursor()
         #Adding
         for seq in sequences:
-            cur.execute("INSERT INTO Sequences(seqID, seqHash) VALUES (%s, %s)", (seq.id, seq.hash))
-
+            cur.execute("INSERT INTO Sequences(seqID, seqHash) VALUES (%s, %s)", (seq.id, seq.hash))   
     except mdb.Error, e:
         print "Error %d: %s" % (e.args[0],e.args[1])
-
     finally:
         if con:
             con.close()
-
-    
-def Gquery():
-   """ print "Give desired username and password"
-    user=raw_input("User:")
-    password = getpass.getpass()
-    """
+            
+            
+def query(query):
+    sequences = []
     try:
-        #Connecting
         con = mdb.connect('localhost', 'guest', 'password', 'genomedb')
-        cur = con.cursor()
-        #Query
-        print "Please insert desired query"
-        query=raw_input("Query:")
+        cur = con.cursor(mdb.cursors.DictCursor)
         cur.execute(query)
-        rows=cur.fetchall()
+        rows = cur.fetchall()
         for row in rows:
-
-       except mdb.Error, e:
+            sequences.append(SeqEntry(row["seqID"],row["seqHash"]))
+    except mdb.Error, e:
         print "Error %d: %s" % (e.args[0],e.args[1])
-
+        
     finally:
         if con:
             con.close()
-
-        
+    return sequences
+            
+       
