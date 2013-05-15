@@ -8,6 +8,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-i', '--input')
 parser.add_argument('-of', '--output file')
 parser.add_argument('-q', '--query')
+parser.add_argument('-u', '--user', default='laadguest')
+parser.add_argument('-v', '--verbose')
 args = parser.parse_args()
 
 def file2seqs(filename):
@@ -31,7 +33,6 @@ def eval_query(query):
     print "Query sent:", query
     return laad.query(query)
 
-
 sequences = []
 if args.input:
     if not os.path.exists(args.input): 
@@ -50,8 +51,7 @@ if args.input:
 
 if args.query:
     print args.query
-    sequences = eval_query(args.query)
-#    laad.query(args.query)
+    sequences = laad.query(args.query, args.user)
 
 if args.output:
     make_file(sequences, args.output)

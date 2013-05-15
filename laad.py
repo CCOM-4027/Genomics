@@ -24,47 +24,15 @@ def Gdataentry(sequences):
         if con:
             con.close()
 
-    
-def Gquery(query):
+def query(query, user='laadguest'):
+    if user == 'laadguest':
+        password = 'password'
+    else:
+        password = getpass.getpass("Please, enter sql password for user %s:" % user)
 
-    """ 
-    print "Give desired username and password"
-    user=raw_input("User:")
-    password = getpass.getpass()
-    """
-    SeqEntry sequences
-
-    try:
-        #Connecting
-        con = mdb.connect('localhost', 'guest', 'password', 'genomedb')
-        cur = con.cursor()
-        #Query
-        #print "Please insert desired query"
-        #query=raw_input("Query:"")
-
-        cur.execute(query)
-        rows=cur.fetchall()
-        for row in rows:
-            if seqID in query:
-                for seq in sequences:
-                    seq.id = row
-            elif seqHash in query:
-                for seq in sequences:
-                    seq.hash = row
-
-       except mdb.Error, e:
-        print "Error %d: %s" % (e.args[0],e.args[1])
-
-    finally:
-        if con:
-            con.close()
-
-    return sequences
-
-def query(query):
    sequences = []
    try:
-       con = mdb.connect('localhost', 'guest', 'password', 'genomedb')
+       con = mdb.connect('localhost', user, password, 'genomedb')
        cur = con.cursor(mdb.cursors.DictCursor)
        cur.execute(query)
        rows = cur.fetchall()
