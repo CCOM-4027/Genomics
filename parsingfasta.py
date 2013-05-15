@@ -3,7 +3,7 @@ import hashlib, os
 
 class seqEntry:
     data = {}
-    def __init__(self, seq_id, seq_hash, path="baz"):
+    def __init__(self, seq_id, seq_hash, path="null"):
         self.data["seqID"] = seq_id
         self.data["seqHash"] = seq_hash
         self.data["path"] = path
@@ -12,13 +12,13 @@ class seqEntry:
         """generate list of insert statements based on which
         fields the sequence has defined"""
        # ret = "INSERT INTO Sequences(seqID, seqHash) VALUES (%('seqID')s, %('seqHash')s", (self.data["seqID"], self.data["seqHash"])
-        ret = "INSERT INTO Sequences(seqID, seqHash) VALUES (%(seqID)s, %(seqHash)s)"
+        ret = "INSERT INTO Sequences(seqID, path) VALUES (%(seqID)s, %(path)s)" % self.data
         return [ret]
 
 def hasher(string):
     m = hashlib.md5()
     m.update(string)
-    return m.digest()
+    return m.hexdigest()
     
 def file_type(filename):
     return "fasta"
