@@ -3,6 +3,8 @@ from parsingfasta import SeqEntry
 import sys
 import getpass
 
+#generateCommands:sequence->string,tuple
+
 def Gdataentry(sequences):
     """
     print "Give desired username and password"
@@ -13,9 +15,11 @@ def Gdataentry(sequences):
         #Connecting
         con = mdb.connect('localhost', 'guest', 'password', 'genomedb')
         cur = con.cursor()
-        #Adding
-        for seq in sequences:
-            cur.execute("INSERT INTO Sequences(seqID, seqHash) VALUES (%s, %s)", (seq.id, seq.hash))
+        #Adding 
+        for sequence in sequences:
+            for command in sequence.commands():
+                cur.execute(command)
+
 
     except mdb.Error, e:
         print "Error %d: %s" % (e.args[0],e.args[1])
