@@ -20,27 +20,21 @@ Function definitions:
 tables = ["CREATE TABLE Sequences(seqID TEXT, seqHash TEXT)", "CREATE TABLE Reeds(sampleID INT, seqHash TEXT)", "CREATE TABLE Assembled(Assembler TEXT, sampleID TEXT, seqID TEXT, seqHash TEXT)", "CREATE TABLE Align(aligner TEXT, sourceID TEXT, targetID TEXT, targetHash TEXT)" ]
 
 #Create database
-def createDatabase(tables):
-    #Connecting as root
-    print"\nThis will create tables automatically\n\nPlease insert root password"
-    password=getpass.getpass()
+def createDatabase(tables, sql):
+    print"\nThis will create tables automatically"
 
     try:
-        #Connection
-        con = mdb.connect('localhost', 'root', password)
-        cur = con.cursor()
-#Database creation
-        cur.execute("CREATE DATABASE genomedb")
-
+        #Database creation
+        sql.execute("CREATE DATABASE genomedb")
         #Table creation
-        cur.execute("Use genomedb")
-        #cur.execute("CREATE TABLE Reads(sample_ID INT)")
+        sql.execute("Use genomedb")
+        #sql.execute("CREATE TABLE Reads(sample_ID INT)")
         for table in tables:
-            cur.execute(table)
+            sql.execute(table)
         print"Tables Created!"
 
-        cur.execute("CREATE USER 'laadguest'@'localhost' IDENTIFIED BY 'password'")
-        cur.execute("GRANT ALL ON genomedb.* TO 'laadguest'@'localhost'")
+        sql.execute("CREATE USER 'laadguest'@'localhost' IDENTIFIED BY 'password'")
+        sql.execute("GRANT ALL ON genomedb.* TO 'laadguest'@'localhost'")
 
         print "Created guest user"
 
@@ -52,15 +46,9 @@ def createDatabase(tables):
             con.close()
 
 #Create user
-def createUserDB():
+def createUserDB(sql):
 
-    #Connecting as root
-    print"\nPlease insert root password"
-    password=getpass.getpass()
     try:
-        #Connection
-        con = mdb.connect('localhost', 'root', password);
-	cur = con.cursor()
         #New user
         print"\nInsert new user name and password"
 	newUser=raw_input("Username:")
@@ -75,8 +63,8 @@ def createUserDB():
                passError = False
 
         #mysql execution
-        cur.execute("CREATE USER %s@'localhost' IDENTIFIED BY %s", (newUser, newPassword))
-        cur.execute("GRANT ALL ON genomedb.* TO %s@'localhost'", newUser)
+        sql.execute("CREATE USER %s@'localhost' IDENTIFIED BY %s", (newUser, newPassword))
+        sql.execute("GRANT ALL ON genomedb.* TO %s@'localhost'", newUser)
 
 	print"Done!"
 
@@ -91,17 +79,9 @@ def createUserDB():
             con.close()
 
 def dropDatabase():
-    #Connecting as root
-    print"\nThis will delete the database completely\n\nPlease insert root password"
-    password=getpass.getpass()
-
     try:
-        #Connection
-        con = mdb.connect('localhost', 'root',
-        password);
-        cur = con.cursor()
         #Database Drop
-        cur.execute("Drop database genomedb")
+        sql.execute("Drop database genomedb")
 	print "Done!"
 
     except mdb.Error, e:
@@ -114,18 +94,12 @@ def dropDatabase():
             con.close()
 
 def dropUser():
-    #Connecting as root
-    print"\nThis will delete the specified user\n\nPlease insert root password"
-    password=getpass.getpass()
+
     try:
-        #Connection
-        con = mdb.connect('localhost', 'root',
-        password);
-        cur = con.cursor()
         #User Drop()
         print "Please indicate the user you which to delete"
 	user = raw_input()
-        cur.execute("Drop User %s@localhost",(user))
+        sql.execute("Drop User %s@localhost",(user))
         print "User deleted"
 
     except mdb.Error, e:
