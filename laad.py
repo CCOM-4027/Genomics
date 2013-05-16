@@ -23,20 +23,19 @@ def command(query, user=guest['username']):
         rows = cur.fetchall()
         for row in rows:
             sequences.append(row)
-
     finally:
         if con:
             con.close()
     return sequences
 
-def do(procedure, user= guest['username'], password=guest['password']):
-    if username == guest['username']:
+def do(procedure, user=guest['username'], password=guest['password']):
+    if user == guest['username']:
         password = guest['password']
     else:
         password = getpass.getpass("Please, enter sql password for user %s:" % user)
     
     try:
-        connection = mdb.connect('localhost', username, password, 'genomedb')
+        connection = mdb.connect('localhost', user, password, 'genomedb')
         cursor = connection.cursor()
         result = procedure(cursor)
         connection.close()

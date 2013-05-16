@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import os, sys, argparse
 import laad
+import config
 from laad import do
 
 from settings import extensions
@@ -26,7 +27,7 @@ parser.add_argument('-q', '--query')
 parser.add_argument('-u', '--user', default='laadguest')
 parser.add_argument('-v', '--verbose', action='store_true')
 parser.add_argument('--init', action='store_true')
-parser.add_argument('--config' action='store_true')
+parser.add_argument('--config', action='store_true')
 args= parser.parse_args()
 
 
@@ -64,3 +65,8 @@ if args.output:
 
 if args.outfile:
     make_file(sequences, args.output)
+
+if args.init:
+    config.createDatabase()
+if args.config:
+    config.menu()
