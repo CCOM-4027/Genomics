@@ -1,28 +1,19 @@
 import MySQLdb as mdb
-from parsingfasta import seqEntry
-import sys
-import getpass
+import sys, getpass, parsingfasta as parse
+from settings import guest
 
-#generateCommands:sequence->string,tuple
+def addEntries(entries, user = 'laadguest'):
+    con = mdb.connect('localhost','laadguest','password', 'genomedb')
+    with con:
+        cur = con.cursor()
+        for entry in entries:
+            for command in parse.insert(entry):
+                cur.execute(command)
 
-def addseqs(sequences):
-    def aux(sql):
-        try:
-        #Connecting
-            for sequence in sequences:
-                for command in sequence.commands():
-                    print command
-                    sql.execute(command, sequence.data)         
-                    
-        except mdb.Error, e:
-            print "Error %d: %s" % (e.args[0],e.args[1])
-
-    return aux
-
-def query(query, user='laadguest'):
+def command(query, user=guest['username']):
     sequences = []
-    if user == 'laadguest':
-        password = 'password'
+    if user == guest['username']:
+        password = guest['password']
     else:
         password = getpass.getpass("Please, enter sql password for user %s:" % user)
     try:
@@ -30,24 +21,23 @@ def query(query, user='laadguest'):
         cur = con.cursor(mdb.cursors.DictCursor)
         cur.execute(query)
         rows = cur.fetchall()
-        print rows
         for row in rows:
-            sequences.append(seqEntry(row["seqID"],row["seqHash"]))
+            sequences.append(row)
 
     finally:
         if con:
             con.close()
     return sequences
 
-def do(procedure,user='laadguest',password='password',database='genomedb'):
-    if user == 'laadguest':
-        password = 'password'
+def do(procedure, user= guest['username'], password=guest['password']):
+    if username == guest['username']:
+        password = guest['password']
     else:
         password = getpass.getpass("Please, enter sql password for user %s:" % user)
     
     try:
-        connection = mdb.connect('localhost', user, password, 'genomedb')
-        cursor = connection.cursor(mdb.cursors.DictCursor)
+        connection = mdb.connect('localhost', username, password, 'genomedb')
+        cursor = connection.cursor()
         result = procedure(cursor)
         connection.close()
         return result
