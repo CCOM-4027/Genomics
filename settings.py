@@ -37,7 +37,7 @@ def aligned(matches):
             'finish':finish}
 
 patterns = [['equals', '(\w+)=(\d+)', equals], 
-            ['align', '(\w+-\w+), (\d+)\.\.(\d+)', align]]
+            ['aligned', '(\w+-\w+), (\d+)\.\.(\d+)', aligned]]
 
 #string = "MID7contig04845 HMEL015723-RA, 7..303  length=351   numreads=7"
 #print foo.make(string)
