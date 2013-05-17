@@ -6,7 +6,7 @@ from laad import do
 
 from settings import extensions
 def knownformat(file):
-    return parse.extension(file) in extensions
+    return parse.extension(file) in reduce(lambda a,b:a+b, extensions.values())
 
 import parsingfasta as parse
 def file2entries(filename):
@@ -52,7 +52,8 @@ if args.input:
 
     if args.verbose:
         print "adding sequences to database"
-    laad.addEntries(sequences)
+    #laad.addEntries(sequences)
+    print sequences
 
 if args.query:
     if args.verbose:
@@ -68,5 +69,6 @@ if args.outfile:
 
 if args.init:
     config.createDatabase()
+
 if args.config:
     config.menu()

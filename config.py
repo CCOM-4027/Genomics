@@ -104,3 +104,8 @@ def menu():
         elif choose == "4":
             do(dropUser,'root')
     print "Bye"
+
+import re
+def regexer(regex):
+    pattern = re.compile(regex)
+    return lambda string: pattern.findall(string)

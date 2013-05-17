@@ -1,19 +1,6 @@
 from Bio import SeqIO
 import hashlib, os
 
-class seqEntry:
-    def __init__(self, seq_id = False, seq_hash = False, path = False):
-        self.data["seqID"] = seq_id
-        self.data["seqHash"] = seq_hash
-        self.data["path"] = path
-    data = {}
-    def commands(self):
-        """generate list of insert statements based on which
-        fields the sequence has defined"""
-       # ret = "INSERT INTO Sequences(seqID, seqHash) VALUES (%('seqID')s, %('seqHash')s", (self.data["seqID"], self.data["seqHash"])'
-        ret = "fooo"
-        return [ret]
-
 def insert(sequence):
     return ["INSERT INTO Sequences(seqID, path) VALUES (\"%(seqID)s\", \"%(path)s\");" % sequence]
 
@@ -21,20 +8,22 @@ def hasher(string):
     m = hashlib.md5()
     m.update(string)
     return m.hexdigest()
-    
-def file_type(filename):
-    return "fasta"
 
+from settings import headers
 def file_to_entries(filename):
-    seq_entries = []
-    for seq_record in SeqIO.parse(filename, file_type(filename)):
-        
-        seq_entries.append({'seqID': seq_record.id,
-                            'seqHash': hasher(str(seq_record.seq)),
-                            'path': filename})
-    #for entry in seq_entries:
-    #    print entry.data["seqHash"]
-    return seq_entries
+    entries = []
+    for record in SeqIO.parse(filename, extension(filename)):
+        entry = {'seqID': record.id,
+                 'description': record.description,
+                 'seqHash': hasher(str(record.seq)),
+                 'path': filename}
+        match = headers['equals'](record.description)
+        if match:
+            for label, value in match:
+                entry[label] = value
+        match = headers
+        entries.append(entry)
+    return entries
 
 def entries_to_file(entries):
     SeqIO.write(seq_entries, "my_fasta.faa", "fasta")
@@ -42,3 +31,28 @@ def entries_to_file(entries):
 def extension(input):
     path, ext = os.path.splitext(input)
     return ext[1:]
+
+from settings import extensions
+def file_type(filename):
+    ext = extension(filename)
+    for extension in extensions.keys():
+        if ext in extensions[key]:
+            return key
+        
+class parser:
+    import re
+    def regexer(self,regex):
+        pattern = re.compile(regex)
+        return lambda string: pattern.findall(string)
+
+    def __init__(self,pattern=[]):
+        self.match, self.parse = {},{}
+        for key,self.match[key],self.parse[key] in pattern:
+            self.match[key] = regexer(self.match[key])
+
+    def make(self,string, entry={}):
+        for label in self.match.keys():
+            match = self.match[label](string)
+            if match:
+                entry.update(self.parse[label](match))
+        return entry
