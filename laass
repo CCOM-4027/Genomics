@@ -14,6 +14,7 @@ parser.add_argument('-u', '--user', default='laadguest')
 parser.add_argument('-v', '--verbose', action='store_true')
 parser.add_argument('--init', action='store_true')
 parser.add_argument('--config', action='store_true')
+parser.add_argument('-d','--description',default="")
 args= parser.parse_args()
 
 
@@ -27,7 +28,7 @@ if args.input:
             if fileIO.fileType(file):
                 if args.verbose:
                     print "Converting file", file, "into entries"
-                entries.extend(fileIO.file2entries(file))
+                entries.extend(fileIO.file2entries(file,args.description))
 
         if os.path.isdir(args.input):
             if args.verbose:
@@ -49,7 +50,8 @@ if args.query:
         print "Query returned",len(entries), "results"
 
 if args.output:
-    print entries
+    for entry in entries:
+        print entry['PI']
 
 if args.outfile:
     if 'fasta' == fileIO.fileType(args.outfile):

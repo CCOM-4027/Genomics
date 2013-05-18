@@ -28,18 +28,18 @@ class parser:
         return entry
 
 
-def file2entries(file):
+def file2entries(file,description=""):
     if fileType(file) == 'fasta':
-        return parseFasta(file)
+        return parseFasta(file,description)
 
 
-def parseFasta(filepath):
+def parseFasta(filepath, description=""):
     from settings import patterns
     fileparser = parser(patterns)
     entries = []
     for record in SeqIO.parse(filepath,extension(filepath)):
         entries.append(
-            fileparser.parse(record.description,
+            fileparser.parse(record.description+" "+description,
                              {'seqID': record.id,
                               'description': record.description,
                               'seqHash': hasher(str(record.seq)),
