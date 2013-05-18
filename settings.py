@@ -5,14 +5,21 @@ tables = [
     "CREATE TABLE Align(aligner TEXT, sourceID TEXT, targetID TEXT, targetHash TEXT)" 
     ]
 
+database = 'genomedb'
 tables2 = {'Sequences':
                [('seqID','TEXT'),
                 ('seqHash', 'TEXT'),
                 ('path','TEXT'),
                 ('sampleID', 'TEXT')],
            'Reeds':
-               [('seqHash', 'TEXT')]
-           }
+               [('seqHash', 'TEXT')],
+           'Aligned':
+               [('aligner', 'TEXT'),
+                ('seqID','TEXT'),
+                ('seqHash', 'TEXT'),
+                ('aligned_to', 'TEXT'),
+                ('start','INT'),
+                ('end','INT')]}
 #users
 #This section defines users that are to be created automatically when the
 #database is initialized
@@ -40,8 +47,8 @@ def equals(matches):
 def aligned(matches):
     target,start,finish = matches[0]
     return {'aligned_to': target,
-            'start':start,
-            'finish':finish}
+            'start':int(start),
+            'end':int(finish)}
 def species(matches):
     number = matches[0]
     return {'species':number}

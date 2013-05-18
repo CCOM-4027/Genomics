@@ -40,7 +40,7 @@ if args.input:
 
     if args.verbose:
         print "Adding",len(entries), "entries to database"
-    #laad.addEntries(sequences)
+    laad.addEntries(entries)
 
 if args.query:
     if args.verbose:
@@ -49,9 +49,9 @@ if args.query:
     if args.verbose:
         print "Query returned",len(entries), "results"
 
+
 if args.output:
-    for entry in entries:
-        print entry['PI']
+    print entries
 
 if args.outfile:
     if 'fasta' == fileIO.fileType(args.outfile):
@@ -66,7 +66,7 @@ if args.outfile:
         print "Error: specified invalid file extension for output; file not created"
 
 if args.init:
-    config.createDatabase()
+    config.createDatabase(args.verbose)
 
 if args.config:
     config.menu()

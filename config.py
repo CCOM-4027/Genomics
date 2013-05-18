@@ -2,6 +2,7 @@
 import MySQLdb as mdb
 import sys, getpass
 from laad import do
+from laad import create
 from settings import guest
 """
 Function definitions:
@@ -20,25 +21,32 @@ Function definitions:
  """
 
 #Create database
-def createDatabase():
-    from settings import tables
+def createDatabase(verbose = False):
     try:
-        #Connection
+        #Connect to SQL
         con = mdb.connect('localhost', 
                           'root', 
                           getpass.getpass("Please insert root password: "))
         cur = con.cursor()
-        cur.execute("CREATE DATABASE genomedb")
-        #Table creation
-        cur.execute("Use genomedb")
-        for table in tables:
-            cur.execute(table)
-        print"Tables Created!"
+        #Create the database
+        from settings import database
+        if verbose:
+            print "Creating database %s..." % database
+        cur.execute("CREATE DATABASE %s" % database)
+        cur.execute("Use %s" % database)
+
+        #Create tables
+        if verbose:
+            print "Creating tables..."
+        from settings import tables2 as tables
+        for statement in create(tables):
+            cur.execute(statement)
+        if verbose:
+            print"Tables Created!"
+        con.close()
+
     except mdb.Error, e:
         print "Error %d: %s" % (e.args[0],e.args[1])
-    finally:
-        if con:
-            con.close()
 
 #Create user
 def createUserDB(sql, username=guest["username"], password=guest["password"]):
@@ -105,7 +113,5 @@ def menu():
             do(dropUser,'root')
     print "Bye"
 
-import re
-def regexer(regex):
-    pattern = re.compile(regex)
-    return lambda string: pattern.findall(string)
+
+        

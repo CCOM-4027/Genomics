@@ -1,9 +1,9 @@
 from Bio import SeqIO
 import hashlib, os
 
-def insert(entry):
+def insert2(entry):
     return ["INSERT INTO Sequences(seqID, path) VALUES (\"%(seqID)s\", \"%(path)s\");" % entry]
-
+                
 def hasher(string):
     m = hashlib.md5()
     m.update(string)
