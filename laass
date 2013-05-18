@@ -3,21 +3,7 @@ import os, sys, argparse
 import laad
 import config
 from laad import do
-
-from settings import extensions
-def knownformat(file):
-    return parse.extension(file) in reduce(lambda a,b:a+b, extensions.values())
-
-import parsingfasta as parse
-def file2entries(filename):
-    return parse.file_to_entries(filename)
-
-def entries2file(entries, filename):
-    if knownformat(filename):
-        for sequence in sequences:
-            print "\t", sequence.id
-    else:
-        print "Error: specified invalid file extension for output"
+import parsingfasta as fileIO
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-i', '--input')
@@ -31,41 +17,51 @@ parser.add_argument('--config', action='store_true')
 args= parser.parse_args()
 
 
-sequences = []
+entries = []
 
 if args.input:
     if not os.path.exists(args.input): 
-        print "File or directory does not exist"
+        print "Error: File or directory does not exist"
     else:
-        def add2sequences(file):
-            if knownformat(file):
-                print "Converting file", file, "into sequence object"
-                sequences.extend(file2entries(file))
+        def add2entries(file):
+            if fileIO.fileType(file):
+                if args.verbose:
+                    print "Converting file", file, "into entries"
+                entries.extend(fileIO.file2entries(file))
 
         if os.path.isdir(args.input):
             if args.verbose:
                 print "Processing files in directory ", args.input
-            for filename in os.listdir(args.input):
-                add2sequences(filename)
+            for file in os.listdir(args.input):
+                add2entries(file)
         else: 
-            add2sequences(args.input)
+            add2entries(args.input)
 
     if args.verbose:
-        print "adding sequences to database"
+        print "Adding",len(entries), "entries to database"
     #laad.addEntries(sequences)
-    print sequences
 
 if args.query:
     if args.verbose:
         print "Sending query:", args.query
-    sequences = laad.command(args.query, args.user)
+    entries = laad.command(args.query, args.user)
+    if args.verbose:
+        print "Query returned",len(entries), "results"
 
 if args.output:
-    for seq in sequences:
-        print seq["seqID"]
+    print entries
 
 if args.outfile:
-    make_file(sequences, args.output)
+    if 'fasta' == fileIO.fileType(args.outfile):
+        if args.verbose:
+            files = len(set([entry['path'] for entry in entries]))
+            print "Fetching",len(entries), "from", files, "source file(s)\n", 
+        records = fileIO.entries2records(entries)
+        if args.verbose:
+            print "Writing",len(entries), "to file",args.outfile
+        fileIO.records2file(records, args.outfile)
+    else:
+        print "Error: specified invalid file extension for output; file not created"
 
 if args.init:
     config.createDatabase()

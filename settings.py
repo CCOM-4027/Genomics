@@ -18,14 +18,6 @@ extensions = {'fasta': ['fasta','fa','fas','fast','fna'],
 #database is created and when any action is attempted without providing a username
 guest = {'username': 'laadguest',
          'password': 'password'}
-
-import re
-def regexer(regex):
-    pattern = re.compile(regex)
-    return lambda string: pattern.findall(string)
-
-headers = {'equals': regexer('(\w+)=(\d+)'),
-           'aligned': regexer('(\w+-\w+), (\d+)\.\.(\d+)')}
         
 def equals(matches):
     return {key:value for key,value in matches}
