@@ -1,25 +1,23 @@
-tables = [
-    "CREATE TABLE Sequences(seqID TEXT, seqHash TEXT, path TEXT)", 
-    "CREATE TABLE Reeds(sampleID TEXT, seqHash TEXT)", 
-    "CREATE TABLE Assembled(Assembler TEXT, sampleID TEXT, seqID TEXT, seqHash TEXT)", 
-    "CREATE TABLE Align(aligner TEXT, sourceID TEXT, targetID TEXT, targetHash TEXT)" 
-    ]
-
 database = 'genomedb'
-tables2 = {'Sequences':
-               [('seqID','TEXT'),
-                ('seqHash', 'TEXT'),
-                ('path','TEXT'),
-                ('sampleID', 'TEXT')],
-           'Reeds':
-               [('seqHash', 'TEXT')],
-           'Aligned':
-               [('aligner', 'TEXT'),
-                ('seqID','TEXT'),
-                ('seqHash', 'TEXT'),
-                ('aligned_to', 'TEXT'),
-                ('start','INT'),
-                ('end','INT')]}
+tables = {
+    'Sequences':
+        [['seqID','TEXT'],
+         ['seqHash', 'TEXT'],
+         ['seq','LONGTEXT'],
+         ['file','TEXT'],
+         ['format','TEXT'],
+         ['sampleID', 'TEXT']],
+    'Reeds':
+        [('seqHash', 'TEXT')],
+    'Aligned':
+        [('aligner', 'TEXT'),
+         ('seqID','TEXT'),
+         ('seqHash', 'TEXT'),
+         ('aligned_to', 'TEXT'),
+         ('score','DOUBLE(15,15)'),
+         ('start','INT'),
+         ('end','INT')]
+    }
 #users
 #This section defines users that are to be created automatically when the
 #database is initialized
@@ -30,8 +28,13 @@ guest = {'username': 'laadguest',
     
 #Extensions
 #this is a mapping of a file format to it's possible extensions
-extensions = {'fasta': ['fasta','fa','fas','fast','fna'],
-              'sam': ['sam']}  
+extensions = {
+    'fasta': ['fasta','fa','fas','fast','fna'],
+    #'sam': ['sam'],
+    'csv': ['csv'],
+    'tsv': ['tsv'],
+    'json': ['json']
+    }
 
 #Patterns  
 #This section deals with patterns for extracting information from description strings
@@ -61,4 +64,20 @@ patterns = [['equals', '(\w+)=(\w+)', equals],
 
 #string = "MID7contig04845 HMEL015723-RA, 7..303  length=351   numreads=7"
 #print foo.make(string)
-
+aliases = {
+    'ximena':
+        {'Fst':'score',
+         'Locus ID':'seqID',
+         '2':'seqID',
+         '9':'seq'}
+    }
+queries = {
+    'allseqs': "select * from Sequences",
+    'ximena': "select seqID,seq from (select seq, seqID from Sequences where file = \"batch_1.catalog.tags.tsv\") as seqs where seqs.seqID in (select seqID from Aligned where score >= .5);",
+    'ximena2':"select seqID from (select seqID from Aligned where score >=.5) as seqs where seqs.seqID in (select seqID from Sequences);"
+    }
+headers = {
+    'catalog':
+        "0,1,2,3,4,5,6,7,8,9,10,11,12"
+    }
+              

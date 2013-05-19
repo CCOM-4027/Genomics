@@ -1,6 +1,7 @@
 import MySQLdb as mdb
 import sys, getpass, parsingfasta as parse
 from settings import guest
+
 def create(tables):
     statements=[]
     for table in tables:
@@ -11,19 +12,15 @@ def create(tables):
     return statements
 
 def insert(entry):
-    text = ['TEXT']
-    from settings import tables2 as tables
+    text = ['TEXT','LONGTEXT']
+    from settings import tables
     statements = []
-    keys = entry
     for table in tables:
         columns, values = "",""
         for column, type in tables[table]:
             if column in entry:
                 columns += ", %s" % column
-                if type in text:
-                    values += ", \"%s\"" % entry[column]
-                else:
-                    values += ", %s" % entry[column]
+                values += (", \"%s\"" if type in text else ", %s") % entry[column]
         if columns:
             statements.append("INSERT INTO %s(%s) VALUES (%s);" % (table,columns[2:],values[2:]))
     return statements
@@ -46,9 +43,8 @@ def command(query, user=guest['username']):
         con = mdb.connect('localhost', user, password, 'genomedb')
         cur = con.cursor(mdb.cursors.DictCursor)
         cur.execute(query)
-        rows = cur.fetchall()
-        for row in rows:
-            sequences.append(row)
+        sequences = cur.fetchall()
+        #for row in rows: sequences.append(row)
     except mdb.Error, e:
         print "Error %d: %s" % (e.args[0],e.args[1])
     

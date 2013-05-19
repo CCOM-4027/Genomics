@@ -7,6 +7,7 @@ import parsingfasta as fileIO
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-i', '--input')
+parser.add_argument('-w', '--insert',action='store_true')
 parser.add_argument('-o', '--output', action='store_true')
 parser.add_argument('-of', '--outfile')
 parser.add_argument('-q', '--query')
@@ -15,58 +16,76 @@ parser.add_argument('-v', '--verbose', action='store_true')
 parser.add_argument('--init', action='store_true')
 parser.add_argument('--config', action='store_true')
 parser.add_argument('-d','--description',default="")
+parser.add_argument('-a','--alias')
 args= parser.parse_args()
 
+translate = lambda(dict): lambda(key): dict[key] if key in dict else key
+
+verbose = True #if args.verbose else False
+
+from settings import aliases, headers
+options = {
+    'description':
+        translate(headers)(args.description),
+    'alias':
+        translate(aliases[args.alias] if args.alias in aliases else {})
+    }
 
 entries = []
-
 if args.input:
-    if not os.path.exists(args.input): 
+    input=args.input
+    if not os.path.exists(input): 
         print "Error: File or directory does not exist"
     else:
         def add2entries(file):
             if fileIO.fileType(file):
-                if args.verbose:
-                    print "Converting file", file, "into entries"
-                entries.extend(fileIO.file2entries(file,args.description))
+                if verbose:
+                    print "Extracting entries from %s..." % file
+                newEntries = fileIO.file2entries(file,options)
+                if verbose:
+                    print "...%s entries extracted!" % len(newEntries)
+                entries.extend(newEntries)
 
-        if os.path.isdir(args.input):
-            if args.verbose:
-                print "Processing files in directory ", args.input
-            for file in os.listdir(args.input):
+        if os.path.isdir(input):
+            if verbose:
+                print "Processing files in directory %s..." % input
+            for file in os.listdir(input):
                 add2entries(file)
         else: 
-            add2entries(args.input)
+            add2entries(input)
+    if verbose:
+        print "%s entries currently in memory" % len(entries)
 
-    if args.verbose:
-        print "Adding",len(entries), "entries to database"
+if args.insert:
+    if verbose:
+        print "Inserting %s entries to database..." % len(entries)
     laad.addEntries(entries)
+    if verbose:
+        print "done!"
 
 if args.query:
-    if args.verbose:
-        print "Sending query:", args.query
-    entries = laad.command(args.query, args.user)
-    if args.verbose:
-        print "Query returned",len(entries), "results"
-
-
-if args.output:
-    print entries
+    from settings import queries
+    query = translate(queries)(args.query)
+    if verbose:
+        print "Sending query:\n%s" % query
+    entries = laad.command(query, args.user)
+    if verbose:
+        print "Query returned",len(entries), "results!"
 
 if args.outfile:
-    if 'fasta' == fileIO.fileType(args.outfile):
-        if args.verbose:
-            files = len(set([entry['path'] for entry in entries]))
-            print "Fetching",len(entries), "from", files, "source file(s)\n", 
-        records = fileIO.entries2records(entries)
-        if args.verbose:
-            print "Writing",len(entries), "to file",args.outfile
-        fileIO.records2file(records, args.outfile)
+    if fileIO.fileType(args.outfile):
+        if verbose:
+            print "Creating file %s..." % args.outfile
+        fileIO.entries2file(entries,args.outfile,verbose)
+        if verbose:
+            print "...success!"
     else:
         print "Error: specified invalid file extension for output; file not created"
 
+if args.output:
+    print entries
 if args.init:
-    config.createDatabase(args.verbose)
+    config.createDatabase(verbose)
 
 if args.config:
     config.menu()

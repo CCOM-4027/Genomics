@@ -38,7 +38,7 @@ def createDatabase(verbose = False):
         #Create tables
         if verbose:
             print "Creating tables..."
-        from settings import tables2 as tables
+        from settings import tables
         for statement in create(tables):
             cur.execute(statement)
         if verbose:
