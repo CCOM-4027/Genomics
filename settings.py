@@ -1,4 +1,38 @@
-database = 'genomedb'
+default = {
+    'database':'genomedb',
+    'username':'laadguest',
+    'password':'password'
+    }
+databases = {
+    'genomedb' : {
+        'Sequences' : [
+            ['seqID','TEXT'],
+            ['seqHash', 'TEXT'],
+            ['seq','LONGTEXT'],
+            ['file','TEXT'],
+            ['format','TEXT'],
+            ['sampleID', 'TEXT']],
+        'Reeds':[
+            ('seqHash', 'TEXT')],
+        'Aligned':
+            [('aligner', 'TEXT'),
+             ('seqID','TEXT'),
+             ('seqHash', 'TEXT'),
+             ('aligned_to', 'TEXT'),
+             ('score','DOUBLE(15,15)'),
+             ('start','INT'),
+             ('end','INT')]},
+    'ximena' : {
+        'Sequences' : [
+            ['seq','LONGTEXT'],
+            ['seqID', 'TEXT']],
+        'Alignments' : [
+            ['seqID', 'TEXT'],
+            ['score', 'DOUBLE(10,10)'],
+            ['pop1','TEXT'],
+            ['pop2','TEXT']]
+        }
+    }
 tables = {
     'Sequences':
         [['seqID','TEXT'],
@@ -24,7 +58,7 @@ tables = {
 #This defines the default username and password for the database, used when the
 #database is created and when any action is attempted without providing a username
 guest = {'username': 'laadguest',
-         'password': 'password'}
+        'password': 'password'}
     
 #Extensions
 #this is a mapping of a file format to it's possible extensions
@@ -39,7 +73,7 @@ extensions = {
 #Patterns  
 #This section deals with patterns for extracting information from description strings
 
-#This first part defines functions that take a list of touples
+#This first part defines functions that take a list of tuples
 #these are generated when a regular expression is matched
 #any non-specified part of a regular expression is captured if there is a match
 #these definitions specify under what key these matches will be stored
@@ -69,12 +103,17 @@ aliases = {
         {'Fst':'score',
          'Locus ID':'seqID',
          '2':'seqID',
-         '9':'seq'}
+         '9':'seq',
+         'Pop 1 ID':'pop1',
+         'Pop 2 ID':'pop2'}
     }
 queries = {
-    'allseqs': "select * from Sequences",
-    'ximena': "select seqID,seq from (select seq, seqID from Sequences where file = \"batch_1.catalog.tags.tsv\") as seqs where seqs.seqID in (select seqID from Aligned where score >= .5);",
-    'ximena2':"select seqID from (select seqID from Aligned where score >=.5) as seqs where seqs.seqID in (select seqID from Sequences);"
+    'allseqs' :
+        "select * from Sequences",
+    'ximena' :
+        "select seqID,seq from (select seq, seqID from Sequences where file = \"batch_1.catalog.tags.tsv\") as seqs where seqs.seqID in (select seqID from Aligned where score >= .5);",
+    'ximena2' :
+        "select seqID from (select seqID from Aligned where score >=.5) as seqs where seqs.seqID in (select seqID from Sequences);"
     }
 headers = {
     'catalog':

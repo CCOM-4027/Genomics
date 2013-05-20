@@ -1,19 +1,43 @@
 import MySQLdb as mdb
 import sys, getpass, parsingfasta as parse
-from settings import guest
+from settings import default
+from settings import databases
+from getpass import getpass
 
-def create(tables):
-    statements=[]
-    for table in tables:
+def commands(commands,database,user,password=None):
+    try:
+        connection = mdb.connect('localhost',user,password)
+        cursor = connection.cursor()
+        #for statement in create(database):
+        #    print statement
+        #    cursor.execute(statement)
+        for command in commands:
+            print command
+            cursor.execute(command)
+        return cursor.fetchall()
+    except mdb.Error,e:
+        print "Error %d: %s" % (e.args[0],e.args[1])
+    finally:
+        if connection:
+            connection.close()
+
+def create(database):
+    if type(database) is not dict and database in databases:
+        statements =["CREATE DATABASE IF NOT EXISTS %s" % database,
+                     "USE %s" % database,
+                     "GRANT ALL ON %s.* TO %s@'localhost'" % (database,default['username']),]
+        database = databases[database]
+    else:
+        statements=[]
+    for table in database:
         columns = ""
-        for column in tables[table]:
-            columns += ", %s %s" % column
-        statements.append("CREATE TABLE %s(%s)" % (table,columns[2:]))
+        for column, datatype in database[table]:
+            columns += ", %s %s" % (column,datatype)
+        statements.append("CREATE TABLE IF NOT EXISTS %s(%s)" % (table,columns[2:]))
     return statements
 
-def insert(entry):
+def insert(entry,tables):
     text = ['TEXT','LONGTEXT']
-    from settings import tables
     statements = []
     for table in tables:
         columns, values = "",""
@@ -23,9 +47,20 @@ def insert(entry):
                 values += (", \"%s\"" if type in text else ", %s") % entry[column]
         if columns:
             statements.append("INSERT INTO %s(%s) VALUES (%s);" % (table,columns[2:],values[2:]))
+    return statements    
+
+def insertEntries(entries,database):
+    statements = []
+    for entry in entries:
+        statements += insert(entry,databases[database])
     return statements
 
-def addEntries(entries, user = guest['username'], password = guest['password']):
+def dropDatabase(database):
+    return ["Drop database %s" % database]
+
+########################################
+
+def addEntries(entries, user = default['username'], password = default['password']):
     con = mdb.connect('localhost','laadguest','password', 'genomedb')
     with con:
         cur = con.cursor()
@@ -33,10 +68,10 @@ def addEntries(entries, user = guest['username'], password = guest['password']):
             for command in insert(entry):
                 cur.execute(command)
 
-def command(query, user=guest['username']):
+def command(query, user=default['username']):
     sequences = []
-    if user == guest['username']:
-        password = guest['password']
+    if user == default['username']:
+        password = default['password']
     else:
         password = getpass.getpass("Please, enter sql password for user %s:" % user)
     try:
@@ -53,9 +88,9 @@ def command(query, user=guest['username']):
             con.close()
     return sequences
 
-def do(procedure, user=guest['username'], password=guest['password']):
-    if user == guest['username']:
-        password = guest['password']
+def do(procedure, user=default['username'], password=default['password']):
+    if user == default['username']:
+        password = default['password']
     else:
         password = getpass.getpass("Please, enter sql password for user %s:" % user)
 

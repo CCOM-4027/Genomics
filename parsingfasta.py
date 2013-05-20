@@ -75,7 +75,7 @@ def tsv2entries(file, options):
     return csvInput(file,options,'excel-tab')
 
 def csvInput(file,options,dialect='excel'):
-    header=options['description']
+    header=options['header']
     from csv import DictReader
     with open(file,'r') as f:
         if not header:

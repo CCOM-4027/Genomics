@@ -2,37 +2,63 @@
 import os, sys, argparse
 import laad
 import config
+from laad import commands
 from laad import do
 import parsingfasta as fileIO
-
+from settings import default
 parser = argparse.ArgumentParser()
-parser.add_argument('-i', '--input')
-parser.add_argument('-w', '--insert',action='store_true')
-parser.add_argument('-o', '--output', action='store_true')
-parser.add_argument('-of', '--outfile')
-parser.add_argument('-q', '--query')
-parser.add_argument('-u', '--user', default='laadguest')
-parser.add_argument('-v', '--verbose', action='store_true')
-parser.add_argument('--init', action='store_true')
-parser.add_argument('--config', action='store_true')
-parser.add_argument('-d','--description',default="")
-parser.add_argument('-a','--alias')
-args= parser.parse_args()
-
-translate = lambda(dict): lambda(key): dict[key] if key in dict else key
+#Input files or directories
+parser.add_argument('-i', '--input', help='Designates a file or directory to be read into memory.')
+#Write to database
+parser.add_argument('-w', '--insert',action='store_true', help='Specifies that entries in memory should be written to database.')
+#Print output
+parser.add_argument('-o', '--output', action='store_true', help='Print entries in memory; mostly for debugging.')
+#Print to file
+parser.add_argument('-of', '--outfile', help='Designates a file to which the entries will be written.')
+#Query the database
+parser.add_argument('-q', '--query', help='Pass a raw SQL query or handle for one; see settings.py for details on handles')
+#Specify username
+parser.add_argument('-u', '--user', default = default['username'], help='Specify username to use when connecting to SQL')
+#be verbose
+parser.add_argument('-p', '--password', action='store_true')
+parser.add_argument('-v', '--verbose', action='store_true',help='specifies whether output should be shown during processing')
+#Create Database
+parser.add_argument('--init', action='store_true', help='Initializes database')
+#Configure Database
+parser.add_argument('--config', action='store_true', help='Drop user into a menu for configuring the database')
+#Describe fasta file
+parser.add_argument('-d','--description',default="", help='Include additional information in description, affects all files read; only used in FASTA')
+#Remap fields according to map
+parser.add_argument('-a','--alias', help='Use an alias to relabel data when parsing')
+parser.add_argument('-hd','--header', help='Use a header specification for csv/tsv files')
+parser.add_argument('-db', '--database', help='Specify database to be used', default=default['database'])
+parser.add_argument('-t','--temp', action='store_true', help='Specify the use of a temporary table to be used to store the data')
+parser.add_argument('--dropDB')
+args = parser.parse_args()
+alias,description,header,database = args.alias,args.description,args.header,args.database
+user=args.user
 
 verbose = True #if args.verbose else False
 
+def translate(dict,alt=False): 
+    return lambda(key): dict[key] if key in dict else (alt if alt else key)
+def str2dict(string):
+    return {key:val for key,val in map(lambda(s):s.split(':'),string.split(','))} if string else {} 
+
+
 from settings import aliases, headers
+descriptions = {}
 options = {
-    'description':
-        translate(headers)(args.description),
     'alias':
-        translate(aliases[args.alias] if args.alias in aliases else {})
+        translate(aliases[alias] if alias in aliases else str2dict(alias)),
+    'description':
+        translate(descriptions)(description),
+    'header':
+        translate(headers)(header),
     }
 
 entries = []
-if args.input:
+if args.input:#calls fileIO.file2entries
     input=args.input
     if not os.path.exists(input): 
         print "Error: File or directory does not exist"
@@ -56,14 +82,24 @@ if args.input:
     if verbose:
         print "%s entries currently in memory" % len(entries)
 
-if args.insert:
+if args.password:
+    from getpass import getpass
+    password = getpass("Please enter sql password for user %s:" % user)
+else:
+    password = default['password']
+
+if args.dropDB:
+    commands(laad.dropDatabase(args.dropDB),database,user,password)
+
+if args.insert:#calls laad.addEntries
     if verbose:
         print "Inserting %s entries to database..." % len(entries)
-    laad.addEntries(entries)
+    #laad.addEntries(entries)
+    laad.commands(laad.insertEntries(entries,database),database,user,password)
     if verbose:
         print "done!"
 
-if args.query:
+if args.query:#calls laad.command returns with entries
     from settings import queries
     query = translate(queries)(args.query)
     if verbose:
@@ -72,7 +108,7 @@ if args.query:
     if verbose:
         print "Query returned",len(entries), "results!"
 
-if args.outfile:
+if args.outfile:#calls fileIO.entries2file
     if fileIO.fileType(args.outfile):
         if verbose:
             print "Creating file %s..." % args.outfile
@@ -84,8 +120,11 @@ if args.outfile:
 
 if args.output:
     print entries
+
 if args.init:
-    config.createDatabase(verbose)
+    commands(create(database),database,'root',getpass("Please enter mySQL password for root>"))
+    #config.createDatabase(database, verbose)
 
 if args.config:
     config.menu()
+
