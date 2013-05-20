@@ -7,7 +7,7 @@ from getpass import getpass
 def commands(commands,database,user,password=None):
     try:
         connection = mdb.connect('localhost',user,password)
-        cursor = connection.cursor()
+        cursor = connection.cursor(mdb.cursors.DictCursor)
         #for statement in create(database):
         #    print statement
         #    cursor.execute(statement)
